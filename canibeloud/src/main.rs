@@ -9,27 +9,26 @@ async fn hello() -> impl Responder {
     // source:
     // https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/
 
-    let month = now.month();
-    // TODO: Use match statements for the month
-    if month >= 10 || month < 4 {
-        let start_noon = now.with_hour(15).unwrap().with_minute(30).unwrap();
-        let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
+    match now.month() {
+        4..=9 => {
+            let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
+            let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
 
-        let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
-        let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
-        if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-            return HttpResponse::Ok().body("No");
+            let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
+            let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
+            if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
+                return HttpResponse::Ok().body("No");
+            }
         }
-    }
+        _ => {
+            let start_noon = now.with_hour(15).unwrap().with_minute(30).unwrap();
+            let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
 
-    if month >= 4 || month <= 9 {
-        let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
-        let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
-
-        let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
-        let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
-        if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-            return HttpResponse::Ok().body("No");
+            let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
+            let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
+            if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
+                return HttpResponse::Ok().body("No");
+            }
         }
     }
 
