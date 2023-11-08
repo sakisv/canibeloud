@@ -1,16 +1,30 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use chrono::{Local, Datelike, Timelike};
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    let now = Local::now();
+enum CanIBeLoud {
+    No,
+    Yes,
+}
+
+impl CanIBeLoud {
+    fn get_message(self) -> String {
+        match self {
+            CanIBeLoud::Yes => String::from("Yes (but within reason)"),
+            CanIBeLoud::No => String::from("No"),
+        }
+    }
+}
+
+stuct Rules {
+
+}
+
+fn can_i_be_loud() -> CanIBeLoud {
     // 1/10 - 31/3: 15:30-17:30 && 22:00-07:30
     // 1/4 - 30/9: 15:00-17:30 && 23:00-07:00
     // source:
     // https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/
-
-    let no_answer = "<html><body><p>No</p></body></html>";
-    let yes_answer = "<html><body><p>Yes (but within reason)</p></body></html>";
+    let now = Local::now();
     match now.month() {
         4..=9 => {
             let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
@@ -19,7 +33,7 @@ async fn hello() -> impl Responder {
             let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
             let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
             if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                return HttpResponse::Ok().body(no_answer);
+                return CanIBeLoud::No;
             }
         }
         _ => {
@@ -29,12 +43,19 @@ async fn hello() -> impl Responder {
             let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
             let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
             if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                return HttpResponse::Ok().body(no_answer);
+                return CanIBeLoud::No;
             }
         }
     }
+    CanIBeLoud::Yes
+}
 
-    HttpResponse::Ok().body(yes_answer)
+#[get("/")]
+async fn hello() -> impl Responder {
+    let can_i_be_loud = can_i_be_loud();
+    let answer = format!("<html><body><p>{}</p></body></html>", can_i_be_loud.get_message());
+
+    HttpResponse::Ok().body(answer)
 }
 
 #[actix_web::main]
