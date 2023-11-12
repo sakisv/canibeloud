@@ -1,23 +1,8 @@
+mod canibeloud;
+use canibeloud::can_i_be_loud::CanIBeLoud;
+
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use chrono::{Local, Datelike, Timelike};
-
-enum CanIBeLoud {
-    No,
-    Yes,
-}
-
-impl CanIBeLoud {
-    fn get_message(self) -> String {
-        match self {
-            CanIBeLoud::Yes => String::from("Yes (but within reason)"),
-            CanIBeLoud::No => String::from("No"),
-        }
-    }
-}
-
-stuct Rules {
-
-}
 
 fn can_i_be_loud() -> CanIBeLoud {
     // 1/10 - 31/3: 15:30-17:30 && 22:00-07:30
