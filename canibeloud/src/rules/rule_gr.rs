@@ -6,7 +6,6 @@
 use chrono::{Local, Timelike as _, Datelike as _};
 use crate::canibeloud::can_i_be_loud::CanIBeLoud;
 
-#[derive()]
 pub struct RuleGR {}
 
 impl RuleGR {
