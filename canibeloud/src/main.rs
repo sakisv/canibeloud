@@ -1,40 +1,20 @@
+mod rules;
+use rules::rule_gr::RuleGR;
+mod canibeloud;
+
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use chrono::{Local, Datelike, Timelike};
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    let now = Local::now();
-    // 1/10 - 31/3: 15:30-17:30 && 22:00-07:30
-    // 1/4 - 30/9: 15:00-17:30 && 23:00-07:00
-    // source:
-    // https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/
+    // 1. get country if available
+    // 2. create instance of that country's law passing current timestamp
+    // 3. get the can_i_be_loud result of that country
+    // 4. print the message
+    let rule = RuleGR::can_i_be_loud();
 
-    let no_answer = "<html><body><p>No</p></body></html>";
-    let yes_answer = "<html><body><p>Yes (but within reason)</p></body></html>";
-    match now.month() {
-        4..=9 => {
-            let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
-            let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
+    let answer = format!("<html><body><p>{}</p></body></html>", rule.get_message());
 
-            let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
-            let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
-            if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                return HttpResponse::Ok().body(no_answer);
-            }
-        }
-        _ => {
-            let start_noon = now.with_hour(15).unwrap().with_minute(30).unwrap();
-            let stop_noon = now.with_hour(17).unwrap().with_minute(30).unwrap();
-
-            let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
-            let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
-            if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                return HttpResponse::Ok().body(no_answer);
-            }
-        }
-    }
-
-    HttpResponse::Ok().body(yes_answer)
+    HttpResponse::Ok().body(answer)
 }
 
 #[actix_web::main]
