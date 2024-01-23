@@ -11,14 +11,17 @@ pub struct EuropeAthens {}
 
 impl Rulelike for EuropeAthens {
     fn can_i_be_loud(&self, _: String) -> RuleResponse {
+        let athens_tz: Tz = "Europe/Athens".parse().unwrap();
+        let now = Local::now().with_timezone(&athens_tz);
+
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Ναι"),
             secondary_text: String::from("(Αλλά με μέτρο)"),
+            tz_datetime: format!("{}", now.format("%A %d %B @ %H:%M")),
+            tz_found: true,
         };
 
-        let athens_tz: Tz = "Europe/Athens".parse().unwrap();
-        let now = Local::now().with_timezone(&athens_tz);
         match now.month() {
             4..=9 => {
                 let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
@@ -27,7 +30,7 @@ impl Rulelike for EuropeAthens {
                 let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
                 let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
                 if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from("")};
+                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from(""), ..r_response};
                 }
             }
             _ => {
@@ -37,7 +40,7 @@ impl Rulelike for EuropeAthens {
                 let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
                 let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
                 if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from("")};
+                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from(""), ..r_response};
                 }
             }
         }

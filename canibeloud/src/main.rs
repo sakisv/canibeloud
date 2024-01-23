@@ -89,17 +89,15 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
     let rule_response = rule.can_i_be_loud(timezone.to_owned());
     CanIBeLoudResponse {
         can_i_be_loud: rule_response.can_i_be_loud,
-        // TODO: add support for secondary text
         response_text: rule_response.response_text,
+        secondary_text: rule_response.secondary_text,
         requested_timezone: timezone.to_owned(),
-        // TODO: show the datetime in the specific timezone
-        calculated_datetime: "TO FIX".to_owned(),
+        tz_datetime: rule_response.tz_datetime,
         timezone_found: false,
     }
 }
 
 async fn cibl(tz_from_request: web::Json<TimezoneFromRequest>) -> Result<impl Responder> {
-
     let response = can_i_be_loud_from_tz(&tz_from_request.timezone);
 
     Ok(web::Json(response))
