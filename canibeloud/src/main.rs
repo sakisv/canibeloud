@@ -1,6 +1,5 @@
 mod rules;
 mod canibeloud;
-use std::collections::HashMap;
 
 use canibeloud::can_i_be_loud::CanIBeLoudResponse;
 
@@ -15,7 +14,7 @@ struct TimezoneFromRequest {
 
 #[get("/")]
 async fn index() -> impl Responder {
-    let targetElementId = "content";
+    let target_element_id = "content";
     let answer = format!(r#"
 <html lang="en">
 <head>
@@ -30,7 +29,7 @@ async fn index() -> impl Responder {
             margin: 0;
         }}
 
-        #{targetElementId} {{
+        #{target_element_id} {{
             font-size: 15vw;
             text-align: center;
             padding: 10vw;
@@ -62,7 +61,7 @@ async fn index() -> impl Responder {
             ).then((response) => response.json())
             .then((data) => {{
                 let className = data.can_i_be_loud ? "yes" : "no";
-                let el = document.getElementById("{targetElementId}");
+                let el = document.getElementById("{target_element_id}");
                 el.className = className;
                 el.innerHTML = data.response_text;
             }})
@@ -71,7 +70,7 @@ async fn index() -> impl Responder {
     </script>
 </head>
 <body>
-    <div id="{targetElementId}">
+    <div id="{target_element_id}">
     </div>
 </body>
 </html>"#);
