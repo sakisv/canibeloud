@@ -15,7 +15,7 @@ impl Rulelike for EuropeLondon {
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Yes"),
-            secondary_text: String::from("(But with reason)"),
+            secondary_text: String::from("(But within reason)"),
             tz_datetime: format!("{}", now.format("%A %d %B @ %H:%M")),
             tz_found: true,
         };

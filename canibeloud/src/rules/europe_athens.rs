@@ -18,7 +18,7 @@ impl Rulelike for EuropeAthens {
             can_i_be_loud: true,
             response_text: String::from("Ναι"),
             secondary_text: String::from("(Αλλά με μέτρο)"),
-            tz_datetime: format!("{}", now.format("%A %d %B @ %H:%M")),
+            tz_datetime: format!("Είναι {}", now.format("%H:%M")),
             tz_found: true,
         };
 
