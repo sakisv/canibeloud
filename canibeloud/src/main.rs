@@ -1,8 +1,11 @@
 mod rules;
-use canibeloud::can_i_be_loud::CanIBeLoudResponse;
 mod canibeloud;
+use std::collections::HashMap;
+
+use canibeloud::can_i_be_loud::CanIBeLoudResponse;
 
 use actix_web::{web, get, App, HttpResponse, HttpServer, Responder, Result};
+use rules::rule::Rulelike;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -76,24 +79,28 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body(answer)
 }
 
-fn can_i_be_loud_from_tz(timezone: String) -> CanIBeLoudResponse {
+fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
+    let rule: Box<dyn Rulelike> = match timezone {
+        "Europe/London" => Box::new(rules::europe_london::EuropeLondon{}),
+        "Europe/Athens" => Box::new(rules::europe_athens::EuropeAthens{}),
+        _ => Box::new(rules::rule::OtherTimezone{}),
+    };
+
+    let rule_response = rule.can_i_be_loud(timezone.to_owned());
     CanIBeLoudResponse {
-        can_i_be_loud: true,
-        response_text: "yes".to_owned(),
+        can_i_be_loud: rule_response.can_i_be_loud,
+        // TODO: add support for secondary text
+        response_text: rule_response.response_text,
         requested_timezone: timezone.to_owned(),
-        timezone_found: true,
-        calculated_datetime: "2023-10-10 19:55:55".to_owned()
+        // TODO: show the datetime in the specific timezone
+        calculated_datetime: "TO FIX".to_owned(),
+        timezone_found: false,
     }
 }
 
 async fn cibl(tz_from_request: web::Json<TimezoneFromRequest>) -> Result<impl Responder> {
-    let response = CanIBeLoudResponse {
-        can_i_be_loud: true,
-        response_text: "yes".to_owned(),
-        requested_timezone: tz_from_request.timezone.to_owned(),
-        timezone_found: true,
-        calculated_datetime: "2023-10-10 19:55:55".to_owned()
-    };
+
+    let response = can_i_be_loud_from_tz(&tz_from_request.timezone);
 
     Ok(web::Json(response))
 }

@@ -10,7 +10,7 @@ use chrono_tz::Tz;
 pub struct EuropeAthens {}
 
 impl Rulelike for EuropeAthens {
-    fn can_i_be_loud(_: String) -> RuleResponse {
+    fn can_i_be_loud(&self, _: String) -> RuleResponse {
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Ναι"),

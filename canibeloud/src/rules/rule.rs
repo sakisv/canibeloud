@@ -9,13 +9,13 @@ pub struct RuleResponse {
 }
 
 pub trait Rulelike {
-    fn can_i_be_loud(timezone: String) -> RuleResponse;
+    fn can_i_be_loud(&self, timezone: String) -> RuleResponse;
 }
 
 pub struct OtherTimezone{}
 
 impl Rulelike for OtherTimezone {
-    fn can_i_be_loud(timezone: String) -> RuleResponse {
+    fn can_i_be_loud(&self, timezone: String) -> RuleResponse {
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Probably"),
