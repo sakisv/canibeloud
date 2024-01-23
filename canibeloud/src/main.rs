@@ -21,13 +21,7 @@ struct CanIBeLoudResponse {
 }
 
 #[get("/")]
-async fn hello() -> impl Responder {
-    // 1. get country if available
-    // 2. create instance of that country's law passing current timestamp
-    // 3. get the can_i_be_loud result of that country
-    // 4. print the message
-    let rule = RuleGR::can_i_be_loud();
-
+async fn index() -> impl Responder {
     let targetElementId = "content";
     let answer = format!(r#"
 <html lang="en">
@@ -118,7 +112,7 @@ async fn cibl(tz_from_request: web::Json<TimezoneFromRequest>) -> Result<impl Re
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(hello)
+            .service(index)
             .route("/cibl", web::post().to(cibl))
     })
     .bind(("127.0.0.1", 8080))?
