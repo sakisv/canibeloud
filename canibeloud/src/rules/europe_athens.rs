@@ -4,13 +4,20 @@
 // https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/
 
 use chrono::{Local, Timelike as _, Datelike as _};
-use crate::canibeloud::can_i_be_loud::CanIBeLoud;
+use super::rule::{Rulelike, RuleResponse};
+use chrono_tz::Europe::Athens;
 
-pub struct RuleGR {}
+pub struct EuropeAthens {}
 
-impl RuleGR {
-    pub fn can_i_be_loud() -> CanIBeLoud {
-        let now = Local::now();
+impl Rulelike for EuropeAthens {
+    fn can_i_be_loud() -> RuleResponse {
+        let mut r_response = RuleResponse {
+            can_i_be_loud: true,
+            response_text: String::from("Ναι"),
+            secondary_text: String::from("(Αλλά με μέτρο)"),
+        };
+
+        let now = Local::now().with_timezone(&Athens);
         match now.month() {
             4..=9 => {
                 let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
@@ -19,7 +26,7 @@ impl RuleGR {
                 let start_night = now.with_hour(23).unwrap().with_minute(0).unwrap();
                 let end_night = now.with_hour(7).unwrap().with_minute(0).unwrap();
                 if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                    return CanIBeLoud::No;
+                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from("")};
                 }
             }
             _ => {
@@ -29,10 +36,10 @@ impl RuleGR {
                 let start_night = now.with_hour(22).unwrap().with_minute(0).unwrap();
                 let end_night = now.with_hour(7).unwrap().with_minute(30).unwrap();
                 if (now >= start_noon && now <= stop_noon) || (now >= start_night || now <= end_night) {
-                    return CanIBeLoud::No;
+                    r_response = RuleResponse{can_i_be_loud: false, response_text: String::from("Όχι"), secondary_text: String::from("")};
                 }
             }
         }
-        CanIBeLoud::Yes
+        r_response
     }
 }
