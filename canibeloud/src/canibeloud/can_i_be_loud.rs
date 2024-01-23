@@ -1,13 +1,9 @@
-pub enum CanIBeLoud {
-    Yes,
-    No,
-}
-
-impl CanIBeLoud {
-    pub fn get_message(self) -> String {
-        match self {
-            CanIBeLoud::Yes => String::from("Yes (but within reason)"),
-            CanIBeLoud::No => String::from("No"),
-        }
-    }
+use serde::Serialize;
+#[derive(Serialize)]
+pub struct CanIBeLoudResponse {
+    can_i_be_loud: bool,
+    response_text: String,
+    requested_timezone: String,
+    timezone_found: bool,
+    calculated_datetime: String,
 }

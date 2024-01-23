@@ -1,23 +1,14 @@
 mod rules;
-use canibeloud::can_i_be_loud::CanIBeLoud;
+use canibeloud::can_i_be_loud::CanIBeLoudResponse;
 use rules::rule_gr::RuleGR;
 mod canibeloud;
 
 use actix_web::{web, get, App, HttpResponse, HttpServer, Responder, Result};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 struct TimezoneFromRequest {
     timezone: String,
-}
-
-#[derive(Serialize)]
-struct CanIBeLoudResponse {
-    can_i_be_loud: bool,
-    response_text: String,
-    requested_timezone: String,
-    timezone_found: bool,
-    calculated_datetime: String,
 }
 
 #[get("/")]
