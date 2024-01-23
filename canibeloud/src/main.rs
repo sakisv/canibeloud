@@ -36,14 +36,28 @@ async fn index() -> impl Responder {
             border-radius: 10px;
         }}
 
+        #response_text {{
+
+        }}
+
+        #secondary_text {{
+            margin-top: 1em;
+            font-size: 0.3em;
+        }}
+
+        #tz_datetime {{
+            margin-top: 1em;
+            font-size: 0.2em;
+        }}
+
         .yes {{
-            background-color: green;
-            color: white;
+            background-color: rgb(36, 138, 61);
+            color: #f3f2f1;
         }}
 
         .no {{
-            background-color: red;
-            color: white;
+            background-color: rgb(215, 0, 21);
+            color: #f3f2f1;
         }}
     </style>
     <script>
@@ -61,9 +75,11 @@ async fn index() -> impl Responder {
             ).then((response) => response.json())
             .then((data) => {{
                 let className = data.can_i_be_loud ? "yes" : "no";
-                let el = document.getElementById("{target_element_id}");
-                el.className = className;
-                el.innerHTML = data.response_text;
+                let parent_el = document.getElementById("{target_element_id}");
+                parent_el.className = className;
+                document.getElementById("response_text").innerHTML = data.response_text;
+                document.getElementById("secondary_text").innerHTML = data.secondary_text;
+                document.getElementById("tz_datetime").innerHTML = data.tz_datetime;
             }})
         }}
         can_i_be_loud();
@@ -71,6 +87,12 @@ async fn index() -> impl Responder {
 </head>
 <body>
     <div id="{target_element_id}">
+        <div id="response_text">
+        </div>
+        <div id="secondary_text">
+        </div>
+        <div id="tz_datetime">
+        </div>
     </div>
 </body>
 </html>"#);
