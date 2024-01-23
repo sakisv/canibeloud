@@ -1,6 +1,5 @@
 mod rules;
 use canibeloud::can_i_be_loud::CanIBeLoudResponse;
-use rules::rule_gr::RuleGR;
 mod canibeloud;
 
 use actix_web::{web, get, App, HttpResponse, HttpServer, Responder, Result};

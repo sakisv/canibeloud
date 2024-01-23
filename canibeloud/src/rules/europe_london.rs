@@ -3,18 +3,20 @@
 
 use chrono::{Local, Timelike as _};
 use super::rule::{Rulelike, RuleResponse};
-use chrono_tz::Europe::London;
+use chrono_tz::Tz;
 
 pub struct EuropeLondon {}
 
 impl Rulelike for EuropeLondon {
-    fn can_i_be_loud() -> RuleResponse {
+    fn can_i_be_loud(_: String) -> RuleResponse {
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Yes"),
             secondary_text: String::from("(But with reason)"),
         };
-        let now = Local::now().with_timezone(&London);
+
+        let london_tz: Tz = "Europe/London".parse().unwrap();
+        let now = Local::now().with_timezone(&london_tz);
         let start = now.with_hour(23).unwrap().with_minute(0).unwrap();
         let end = now.with_hour(7).unwrap().with_minute(0).unwrap();
         if now >= start && now <= end {

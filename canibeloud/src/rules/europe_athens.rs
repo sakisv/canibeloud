@@ -5,19 +5,20 @@
 
 use chrono::{Local, Timelike as _, Datelike as _};
 use super::rule::{Rulelike, RuleResponse};
-use chrono_tz::Europe::Athens;
+use chrono_tz::Tz;
 
 pub struct EuropeAthens {}
 
 impl Rulelike for EuropeAthens {
-    fn can_i_be_loud() -> RuleResponse {
+    fn can_i_be_loud(_: String) -> RuleResponse {
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
             response_text: String::from("Ναι"),
             secondary_text: String::from("(Αλλά με μέτρο)"),
         };
 
-        let now = Local::now().with_timezone(&Athens);
+        let athens_tz: Tz = "Europe/Athens".parse().unwrap();
+        let now = Local::now().with_timezone(&athens_tz);
         match now.month() {
             4..=9 => {
                 let start_noon = now.with_hour(15).unwrap().with_minute(0).unwrap();
