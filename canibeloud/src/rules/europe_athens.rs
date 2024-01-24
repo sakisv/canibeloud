@@ -20,6 +20,7 @@ impl Rulelike for EuropeAthens {
             secondary_text: String::from("(Αλλά με μέτρο)"),
             tz_datetime: format!("Είναι {}", now.format("%H:%M")),
             tz_found: true,
+            source_url: "https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/".to_owned(),
         };
 
         match now.month() {

@@ -114,6 +114,7 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
         secondary_text: rule_response.secondary_text,
         requested_timezone: timezone.to_owned(),
         tz_datetime: rule_response.tz_datetime,
+        source: rule_response.source_url,
         timezone_found: false,
     }
 }
