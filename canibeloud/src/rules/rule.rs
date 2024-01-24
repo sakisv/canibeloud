@@ -36,7 +36,7 @@ impl Rulelike for OtherTimezone {
 
         let start = now.with_hour(23).unwrap().with_minute(0).unwrap();
         let end = now.with_hour(7).unwrap().with_minute(0).unwrap();
-        if now >= start && now <= end {
+        if now >= start || now <= end {
             r_response = RuleResponse { can_i_be_loud: false, response_text: String::from("No"), secondary_text: String::from("Use common sense"), ..r_response};
         }
         r_response
