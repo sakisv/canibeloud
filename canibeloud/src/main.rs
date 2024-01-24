@@ -14,14 +14,17 @@ struct TimezoneFromRequest {
 
 #[get("/")]
 async fn index() -> impl Responder {
-    let target_element_id = "content";
     let answer = format!(r#"
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@900&family=Open+Sans:wght@800&family=Roboto+Mono:wght@100;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {{
+            font-family: 'Open Sans', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,15 +32,14 @@ async fn index() -> impl Responder {
             margin: 0;
         }}
 
-        #{target_element_id} {{
+        #content {{
             font-size: 15vw;
             text-align: center;
-            padding: 10vw;
             border-radius: 10px;
         }}
 
         #response_text {{
-
+            font-family: 'Noto Sans Mono', monospace;
         }}
 
         #secondary_text {{
@@ -50,6 +52,11 @@ async fn index() -> impl Responder {
             font-size: 0.2em;
         }}
 
+        #source {{
+            margin-top: 1em;
+            font-size: 0.1em;
+        }}
+
         .yes {{
             background-color: rgb(36, 138, 61);
             color: #f3f2f1;
@@ -59,10 +66,14 @@ async fn index() -> impl Responder {
             background-color: rgb(215, 0, 21);
             color: #f3f2f1;
         }}
+
+        .hidden {{
+            display: none;
+        }}
+
     </style>
     <script>
         function can_i_be_loud() {{
-            console.log("boo");
             let origin = window.location.origin;
             let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             fetch(
@@ -75,23 +86,25 @@ async fn index() -> impl Responder {
             ).then((response) => response.json())
             .then((data) => {{
                 let className = data.can_i_be_loud ? "yes" : "no";
-                let parent_el = document.getElementById("{target_element_id}");
-                parent_el.className = className;
-                document.getElementById("response_text").innerHTML = data.response_text;
+                document.body.className = className;
+                document.getElementById("response_text").innerHTML = data.response_text.toUpperCase();
                 document.getElementById("secondary_text").innerHTML = data.secondary_text;
                 document.getElementById("tz_datetime").innerHTML = data.tz_datetime;
+                document.getElementById("source").innerHTML = data.source != "" ? "<a href=\"" + data.source + "\">Source</a>" : "";
             }})
         }}
         can_i_be_loud();
     </script>
 </head>
 <body>
-    <div id="{target_element_id}">
+    <div id="content">
         <div id="response_text">
         </div>
         <div id="secondary_text">
         </div>
         <div id="tz_datetime">
+        </div>
+        <div id="source">
         </div>
     </div>
 </body>
