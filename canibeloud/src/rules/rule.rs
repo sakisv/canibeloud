@@ -8,6 +8,7 @@ pub struct RuleResponse {
     pub secondary_text: String,
     pub tz_datetime: String,
     pub tz_found: bool,
+    pub source_url: String,
 }
 
 pub trait Rulelike {
@@ -30,6 +31,7 @@ impl Rulelike for OtherTimezone {
             secondary_text: String::from("(But within reason)"),
             tz_datetime: format!("{}", now.format("%A %d %B @ %H:%M")),
             tz_found: false,
+            source_url: "".to_owned(),
         };
 
         let start = now.with_hour(23).unwrap().with_minute(0).unwrap();

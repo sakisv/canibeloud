@@ -18,6 +18,7 @@ impl Rulelike for EuropeLondon {
             secondary_text: String::from("(But within reason)"),
             tz_datetime: format!("{}", now.format("%A %d %B @ %H:%M")),
             tz_found: true,
+            source_url: "https://www.gov.uk/guidance/noise-nuisances-how-councils-deal-with-complaints".to_owned(),
         };
 
         let start = now.with_hour(23).unwrap().with_minute(0).unwrap();
