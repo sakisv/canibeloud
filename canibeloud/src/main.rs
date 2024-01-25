@@ -57,6 +57,10 @@ async fn index() -> impl Responder {
             font-size: 0.1em;
         }}
 
+        a {{
+            color: #f3f2f1;
+        }}
+
         .yes {{
             background-color: rgb(36, 138, 61);
             color: #f3f2f1;
