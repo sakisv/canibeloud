@@ -124,7 +124,8 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
         _ => Box::new(rules::rule::OtherTimezone{}),
     };
 
-    let rule_response = rule.can_i_be_loud(timezone.to_owned());
+    let utc_now = chrono::Utc::now();
+    let rule_response = rule.can_i_be_loud(utc_now, timezone.to_owned());
     CanIBeLoudResponse {
         can_i_be_loud: rule_response.can_i_be_loud,
         response_text: rule_response.response_text,
