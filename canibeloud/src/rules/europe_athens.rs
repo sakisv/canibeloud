@@ -3,16 +3,16 @@
 // source:
 // https://www.astynomia.gr/odigos-tou-politi/chrisimes-symvoules/diafores/poies-einai-oi-ores-koinis-isychias/
 
-use chrono::{Local, Timelike as _, Datelike as _};
+use chrono::{DateTime, Utc, Timelike as _, Datelike as _};
 use super::rule::{Rulelike, RuleResponse};
 use chrono_tz::Tz;
 
 pub struct EuropeAthens {}
 
 impl Rulelike for EuropeAthens {
-    fn can_i_be_loud(&self, _: String) -> RuleResponse {
+    fn can_i_be_loud(&self, utc_now: DateTime<Utc>, _: String) -> RuleResponse {
         let athens_tz: Tz = "Europe/Athens".parse().unwrap();
-        let now = Local::now().with_timezone(&athens_tz);
+        let now = utc_now.with_timezone(&athens_tz);
 
         let mut r_response = RuleResponse {
             can_i_be_loud: true,
@@ -46,5 +46,80 @@ impl Rulelike for EuropeAthens {
             }
         }
         r_response
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::{Utc, TimeZone};
+    use chrono_tz::Europe::Athens;
+
+    use crate::rules::{europe_athens::EuropeAthens, rule::Rulelike};
+
+    #[test]
+    fn test_europe_athens_rule() {
+        let europe_athens = EuropeAthens{};
+        let tz = "Europe/Athens".to_owned();
+
+        // winter
+
+        let winter_morning = Athens.with_ymd_and_hms(2023, 11, 13, 10, 15, 00).unwrap();
+        let winter_morning_res = europe_athens.can_i_be_loud(winter_morning.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, winter_morning_res.can_i_be_loud);
+
+        let winter_noon = Athens.with_ymd_and_hms(2023, 11, 13, 16, 15, 00).unwrap();
+        let winter_noon_res = europe_athens.can_i_be_loud(winter_noon.with_timezone(&Utc), tz.clone());
+        assert_eq!(false, winter_noon_res.can_i_be_loud);
+
+        let winter_evening = Athens.with_ymd_and_hms(2023, 11, 13, 19, 15, 00).unwrap();
+        let winter_evening_res = europe_athens.can_i_be_loud(winter_evening.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, winter_evening_res.can_i_be_loud);
+
+        let winter_night = Athens.with_ymd_and_hms(2023, 11, 13, 23, 15, 00).unwrap();
+        let winter_night_res = europe_athens.can_i_be_loud(winter_night.with_timezone(&Utc), tz.clone());
+        assert_eq!(false, winter_night_res.can_i_be_loud);
+
+
+        // summer
+
+        let summer_morning = Athens.with_ymd_and_hms(2023, 07, 13, 10, 15, 00).unwrap();
+        let summer_morning_res = europe_athens.can_i_be_loud(summer_morning.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, summer_morning_res.can_i_be_loud);
+
+        let summer_noon = Athens.with_ymd_and_hms(2023, 07, 13, 16, 15, 00).unwrap();
+        let summer_noon_res = europe_athens.can_i_be_loud(summer_noon.with_timezone(&Utc), tz.clone());
+        assert_eq!(false, summer_noon_res.can_i_be_loud);
+
+        let summer_evening = Athens.with_ymd_and_hms(2023, 07, 13, 19, 15, 00).unwrap();
+        let summer_evening = europe_athens.can_i_be_loud(summer_evening.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, summer_evening.can_i_be_loud);
+
+        let summer_night = Athens.with_ymd_and_hms(2023, 07, 13, 23, 15, 00).unwrap();
+        let summer_night_res = europe_athens.can_i_be_loud(summer_night.with_timezone(&Utc), tz.clone());
+        assert_eq!(false, summer_night_res.can_i_be_loud);
+
+        // differences (morning @ 07:15)
+        let summer_early_morning = Athens.with_ymd_and_hms(2023, 07, 13, 07, 15, 00).unwrap();
+        let winter_early_morning = Athens.with_ymd_and_hms(2023, 11, 13, 07, 15, 00).unwrap();
+        let summer_early_morning_res = europe_athens.can_i_be_loud(summer_early_morning.with_timezone(&Utc), tz.clone());
+        let winter_early_morning_res = europe_athens.can_i_be_loud(winter_early_morning.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, summer_early_morning_res.can_i_be_loud);
+        assert_eq!(false, winter_early_morning_res.can_i_be_loud);
+
+        // differences (noon @ 15:15)
+        let summer_early_noon = Athens.with_ymd_and_hms(2023, 07, 13, 15, 15, 00).unwrap();
+        let winter_early_noon = Athens.with_ymd_and_hms(2023, 11, 13, 15, 15, 00).unwrap();
+        let summer_early_noon_res = europe_athens.can_i_be_loud(summer_early_noon.with_timezone(&Utc), tz.clone());
+        let winter_early_noon_res = europe_athens.can_i_be_loud(winter_early_noon.with_timezone(&Utc), tz.clone());
+        assert_eq!(false, summer_early_noon_res.can_i_be_loud);
+        assert_eq!(true, winter_early_noon_res.can_i_be_loud);
+
+        // differences (night @ 22:15)
+        let summer_early_night = Athens.with_ymd_and_hms(2023, 07, 13, 22, 15, 00).unwrap();
+        let winter_early_night = Athens.with_ymd_and_hms(2023, 11, 13, 22, 15, 00).unwrap();
+        let summer_early_night_res = europe_athens.can_i_be_loud(summer_early_night.with_timezone(&Utc), tz.clone());
+        let winter_early_night_res = europe_athens.can_i_be_loud(winter_early_night.with_timezone(&Utc), tz.clone());
+        assert_eq!(true, summer_early_night_res.can_i_be_loud);
+        assert_eq!(false, winter_early_night_res.can_i_be_loud);
     }
 }

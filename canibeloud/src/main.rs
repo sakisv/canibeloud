@@ -124,7 +124,8 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
         _ => Box::new(rules::rule::OtherTimezone{}),
     };
 
-    let rule_response = rule.can_i_be_loud(timezone.to_owned());
+    let utc_now = chrono::Utc::now();
+    let rule_response = rule.can_i_be_loud(utc_now, timezone.to_owned());
     CanIBeLoudResponse {
         can_i_be_loud: rule_response.can_i_be_loud,
         response_text: rule_response.response_text,
@@ -132,7 +133,7 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
         requested_timezone: timezone.to_owned(),
         tz_datetime: rule_response.tz_datetime,
         source: rule_response.source_url,
-        timezone_found: false,
+        timezone_found: rule_response.tz_found,
     }
 }
 
@@ -152,4 +153,19 @@ async fn main() -> std::io::Result<()> {
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::can_i_be_loud_from_tz;
+
+    #[test]
+    fn test_can_i_be_loud_from_tz() {
+        let res = can_i_be_loud_from_tz("Europe/Athens");
+        assert_eq!(true, res.timezone_found);
+
+        let res = can_i_be_loud_from_tz("Asia/Beirut");
+        assert_eq!(false, res.timezone_found);
+    }
 }
