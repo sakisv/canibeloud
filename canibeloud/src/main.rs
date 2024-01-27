@@ -151,7 +151,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(index)
             .route("/cibl", web::post().to(cibl))
-            .wrap(Logger::new(r#"%a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T"#))
+            .wrap(Logger::new(r#"%t %a "%{r}a" "%r" %s %b %Dms "%{Referer}i" "%{User-Agent}i""#))
     })
     .bind(("127.0.0.1", 8080))?
     .run()
