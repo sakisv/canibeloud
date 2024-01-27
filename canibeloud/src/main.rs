@@ -4,6 +4,7 @@ mod canibeloud;
 use canibeloud::can_i_be_loud::CanIBeLoudResponse;
 
 use actix_web::{web, get, App, HttpResponse, HttpServer, Responder, Result};
+use actix_web::middleware::Logger;
 use rules::rule::Rulelike;
 use serde::Deserialize;
 
@@ -145,10 +146,12 @@ async fn cibl(tz_from_request: web::Json<TimezoneFromRequest>) -> Result<impl Re
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     HttpServer::new(|| {
         App::new()
             .service(index)
             .route("/cibl", web::post().to(cibl))
+            .wrap(Logger::new(r#"%a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T"#))
     })
     .bind(("127.0.0.1", 8080))?
     .run()
