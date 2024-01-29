@@ -1,3 +1,5 @@
+use std::env;
+use log::info;
 mod rules;
 mod canibeloud;
 
@@ -146,14 +148,18 @@ async fn cibl(tz_from_request: web::Json<TimezoneFromRequest>) -> Result<impl Re
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let bind_addr = env::var("CAN_I_BE_LOUD_BIND_ADDR").unwrap_or("127.0.0.1".into());
+    let port = env::var("CAN_I_BE_LOUD_PORT").unwrap_or("8080".into());
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
+    info!("Listening on {bind_addr}:{port}");
     HttpServer::new(|| {
         App::new()
             .service(index)
             .route("/cibl", web::post().to(cibl))
             .wrap(Logger::new(r#"%t %a "%{r}a" "%r" %s %b %Dms "%{Referer}i" "%{User-Agent}i""#))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((bind_addr, port.parse().unwrap()))?
     .run()
     .await
 }
