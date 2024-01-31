@@ -14,4 +14,8 @@ runcmd:
  - chmod +x ${custom_caddy_filename}
  - service caddy stop
  - mv ${custom_caddy_filename} $(which caddy)
+
+# echo the Caddyfile to the right location and restart caddy
+ - echo "${b64_caddyfile}" | base64 --decode > ${caddyfile_location}
+
  - service caddy start

@@ -1,0 +1,25 @@
+${domain} {
+        tls {
+                dns cloudflare ${cloudflare_caddy_api_token}
+        }
+
+        header {
+                # No need to advertise the server
+                -Server
+        }
+
+
+        handle /* {
+                reverse_proxy ${proxy_addr_and_port}
+        }
+
+        log {
+                output file /var/log/caddy/${domain}.access.log {
+                        roll_size 50MiB
+                }
+        }
+}
+
+www.${domain} {
+        redir https://${domain}{uri}
+}

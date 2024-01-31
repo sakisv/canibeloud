@@ -46,3 +46,12 @@ variable "cloudflare_ttl" {
 variable "environment" {
   type = string
 }
+
+variable "b64_caddyfile" {
+  type = string
+}
+
+variable "caddyfile_location" {
+  type    = string
+  default = "/etc/caddy/Caddyfile"
+}

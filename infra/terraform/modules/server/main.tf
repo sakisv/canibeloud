@@ -18,6 +18,8 @@ resource "hcloud_server" "web" {
   user_data = templatefile("${path.module}/userdata/userdata.yml", {
     public_bucket_url     = var.public_bucket_url
     custom_caddy_filename = var.custom_caddy_filename
+    b64_caddyfile         = var.b64_caddyfile
+    caddyfile_location    = var.caddyfile_location
   })
   firewall_ids = [hcloud_firewall.web_and_ssh.id]
 }
