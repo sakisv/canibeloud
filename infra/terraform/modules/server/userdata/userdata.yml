@@ -1,0 +1,21 @@
+#cloud-config
+runcmd:
+ - curl -fsSL https://get.docker.com | sh
+
+# install "vanilla" caddy first to get it configured as service, etc
+ - apt install -y debian-keyring debian-archive-keyring apt-transport-https
+ - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+ - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+ - apt update
+ - apt install caddy
+
+# then fetch custom caddy to replace the vanilla one
+ - wget ${public_bucket_url}/${custom_caddy_filename}
+ - chmod +x ${custom_caddy_filename}
+ - service caddy stop
+ - mv ${custom_caddy_filename} $(which caddy)
+
+# echo the Caddyfile to the right location and restart caddy
+ - echo "${b64_caddyfile}" | base64 --decode > ${caddyfile_location}
+
+ - service caddy start
