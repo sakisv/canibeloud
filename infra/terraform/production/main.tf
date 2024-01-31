@@ -1,3 +1,5 @@
+data "pass_password" "public_bucket_url" { path = "credentials/cloudflare/public_bucket_url" }
+
 module "server" {
   source      = "../modules/server"
   name_prefix = "canibeloud-production"
@@ -7,6 +9,7 @@ module "server" {
     { "name" : "@", "use_proxy" : false }, # TODO: change when caddy is configured
     { "name" : "www", "use_proxy" : false },
   ]
+  public_bucket_url  = data.pass_password.public_bucket_url.password
   cloudflare_zone_id = module.canibeloud_zone.zone_id
   ssh_key_ids        = module.ssh_keys.key_ids
   environment        = "production"

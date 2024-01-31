@@ -24,6 +24,15 @@ variable "ssh_key_ids" {
   type = list(string)
 }
 
+variable "public_bucket_url" {
+  type = string
+}
+
+variable "custom_caddy_filename" {
+  type    = string
+  default = "caddy_linux_arm64_custom"
+}
+
 variable "cloudflare_zone_id" {
   type = string
 }

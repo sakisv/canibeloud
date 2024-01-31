@@ -10,12 +10,15 @@ resource "random_string" "server_name_suffix" {
 }
 
 resource "hcloud_server" "web" {
-  name         = "${var.name_prefix}-${random_string.server_name_suffix.result}"
-  image        = local.image
-  server_type  = var.server_type
-  location     = var.location
-  ssh_keys     = var.ssh_key_ids
-  user_data    = "${path.module}/userdata/userdata.yml"
+  name        = "${var.name_prefix}-${random_string.server_name_suffix.result}"
+  image       = local.image
+  server_type = var.server_type
+  location    = var.location
+  ssh_keys    = var.ssh_key_ids
+  user_data = templatefile("${path.module}/userdata/userdata.yml", {
+    public_bucket_url     = var.public_bucket_url
+    custom_caddy_filename = var.custom_caddy_filename
+  })
   firewall_ids = [hcloud_firewall.web_and_ssh.id]
 }
 
