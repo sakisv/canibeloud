@@ -4,7 +4,6 @@ FROM rust:1.75.0-slim-buster as build
 
 ARG TARGET_ARCHITECTURE
 
-# RUN apt-get update && apt-get install -y musl-tools
 RUN rustup target add ${TARGET_ARCHITECTURE}
 
 COPY . /src
