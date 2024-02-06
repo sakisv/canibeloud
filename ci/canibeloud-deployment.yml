@@ -1,0 +1,124 @@
+---
+
+resource_types:
+  - name: email
+    type: registry-image
+    source:
+      repository: pcfseceng/email-resource
+
+resources:
+  - name: canibeloud-deployment-pipeline
+    type: git
+    icon: github
+    source:
+      private_key: |
+        ((ssh_private_key))
+      uri: git@github.com:sakisv/canibeloud.git
+      branch: main
+      paths:
+        - ci/canibeloud-deployment.yml
+
+  - name: canibeloud-app
+    type: git
+    icon: github
+    source:
+      private_key: |
+        ((ssh_private_key))
+      uri: git@github.com:sakisv/canibeloud.git
+      branch: main
+      ignore_paths:
+        - ci/canibeloud-deployment.yml
+        - infra/terraform/*
+
+  - name: canibeloud-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: docker.io/sakisv/canibeloud
+      username: ((dockerhub_api_username))
+      password: ((dockerhub_api_password))
+
+  - name: send-email
+    type: email
+    icon: github
+    source:
+      smtp:
+        host: smtp.fastmail.com
+        port: "587"
+        username: ((fastmail_username))
+        password: ((fastmail_password))
+      from: ((email_address_sender))
+      to:
+        - ((email_address_recipient))
+
+
+jobs:
+  - name: build-image
+    serial: true
+    plan:
+      - get: canibeloud-app
+        trigger: true
+
+      - task: create-tags
+        on_failure: &on_failure
+          put: send-email
+          params:
+            subject_text: "Failed build ${BUILD_PIPELINE_NAME}/${BUILD_JOB_NAME}/${BUILD_NAME}"
+            body_text: "Build failed: ${ATC_EXTERNAL_URL}/teams/canibeloud/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}"
+        config:
+          image_resource:
+            type: registry-image
+            source:
+              repository: sakisv/ubuntu
+              tag: latest
+          platform: linux
+          inputs:
+            - name: canibeloud-app
+          outputs:
+            - name: image-tags
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                GIT_REF=$(cat canibeloud-app/.git/short_ref)
+                DATETIME=$(date +"%Y%m%d-%H%M")
+                echo "${GIT_REF} ${DATETIME}" > image-tags/tags
+
+      - task: build-image
+        on_failure: *on_failure
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+              tag: latest
+          run:
+            path: build
+          outputs:
+            - name: image
+          inputs:
+            - name: canibeloud-app
+          params:
+            # docs: https://github.com/concourse/oci-build-task
+            CONTEXT: canibeloud-app/canibeloud
+            DOCKERFILE: canibeloud-app/canibeloud/Dockerfile
+            IMAGE_PLATFORM: linux/arm64
+            BUILD_ARG_TARGET_ARCHITECTURE: aarch64-unknown-linux-gnu
+
+      - put: canibeloud-image
+        params:
+          image: "image/image.tar"
+          additional_tags: image-tags/tags
+        get_params:
+          skip_download: true
+
+
+  - name: update-pipeline
+    plan:
+      - get: canibeloud-deployment-pipeline
+        trigger: true
+      - set_pipeline: canibeloud-deployment
+        file: canibeloud-deployment-pipeline/ci/canibeloud-deployment.yml
