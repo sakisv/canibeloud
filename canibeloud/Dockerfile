@@ -1,4 +1,4 @@
-ARG TARGET_ARCHITECTURE=x86_64-unknown-linux-gnu
+ARG TARGET_ARCHITECTURE=aarch64-unknown-linux-gnu
 
 FROM rust:1.75.0-slim-buster as build
 
