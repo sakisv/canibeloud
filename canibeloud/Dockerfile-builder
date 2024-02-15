@@ -7,7 +7,7 @@ ARG TARGET_ARCHITECTURE
 RUN rustup target add ${TARGET_ARCHITECTURE}
 
 WORKDIR /code
-RUN mkdir src && echo 'fn main() {}' > src/main.rs
+RUN mkdir src && echo 'fn main() {println!("hello world");}' > src/main.rs
 COPY Cargo.* .
 
 RUN cargo build --release --target=${TARGET_ARCHITECTURE}
