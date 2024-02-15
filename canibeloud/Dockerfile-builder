@@ -11,4 +11,4 @@ RUN mkdir src && echo 'fn main() {println!("hello world");}' > src/main.rs
 COPY Cargo.* .
 
 RUN cargo build --release --target=${TARGET_ARCHITECTURE}
-RUN rm -rf src/main.rs
+RUN rm -rf src/ target/${TARGET_ARCHITECTURE}/release/.fingerprint/canibeloud-*
