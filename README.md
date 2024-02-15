@@ -20,7 +20,17 @@ automatically recompile and run everytime there is a change with `cargo watch -x
 
 ### Docker
 
-#### Building
+#### Building and pushing the `builder` image
+
+To build the `builder` which contains precompiled versions of the dependencies:
+
+    $ cd canibeloud
+    $ docker buildx build --build-arg --platform=linux/arm64 -t sakisv/canibeloud-builder:main -f Dockerfile-builder  .
+    $ docker push sakisv/canibeloud-builder:main
+
+#### Building the app image
+
+The app image relies on the `builder` image being available on dockerhub ☝️
 
 To build a docker image on your current branch:
 
@@ -28,7 +38,9 @@ To build a docker image on your current branch:
     $ branch=$(git rev-parse --abbrev-ref HEAD)
     $ docker buildx build --platform=linux/amd64 -t canibeloud:${branch} .
 
-Notice the `--platform` argument and the `TARGET_ARCHITECTURE` in the Dockerfile.
+By default this will build an image for `linux/amd64` and the rust target will be `aarch64-unknown-linux-gnu`.
+
+These are controlled by the `--platform` argument in the command above and the `ARG TARGET_ARCHITECTURE` in the Dockerfile.
 
 The first one tells docker which version of the images to fetch from dockerhub, whereas
 the second tells rust which architecture the build is intended for.
