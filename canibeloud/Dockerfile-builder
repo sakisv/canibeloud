@@ -1,0 +1,14 @@
+ARG TARGET_ARCHITECTURE=aarch64-unknown-linux-gnu
+
+FROM rust:1.75.0-slim-buster
+
+ARG TARGET_ARCHITECTURE
+
+RUN rustup target add ${TARGET_ARCHITECTURE}
+
+WORKDIR /code
+RUN mkdir src && echo 'fn main() {println!("hello world");}' > src/main.rs
+COPY Cargo.* .
+
+RUN cargo build --release --target=${TARGET_ARCHITECTURE}
+RUN rm -rf src/ target/${TARGET_ARCHITECTURE}/release/.fingerprint/canibeloud-*

@@ -1,4 +1,6 @@
 Dockerfile
+Dockerfile-builder
+.dockerignore
 
 .vscode/*
 target/*
