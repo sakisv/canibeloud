@@ -115,6 +115,56 @@ jobs:
         get_params:
           skip_download: true
 
+  - name: deploy-production
+    serial: true
+    plan:
+      - get: canibeloud-app
+        passed:
+          - build-image
+        trigger: true
+
+      - task: deploy-container
+        on_failure: *on_failure
+        config:
+          inputs:
+            - name: canibeloud-app
+          image_resource:
+            type: registry-image
+            source:
+              repository: sakisv/ubuntu
+              tag: latest
+          platform: linux
+          params:
+            SSH_PRIVATE_KEY: |
+              ((ssh_private_key))
+            TARGET_HOST: "canibeloud.com"
+            CONTAINER_NAME: "canibeloud"
+
+          run: &deploy-steps
+            path: bash
+            args:
+              - -c
+              - |
+                # load the deploy tag
+                DEPLOY_TAG=$(cat canibeloud-app/.git/short_ref)
+                export FULL_IMAGE="sakisv/canibeloud:${DEPLOY_TAG}"
+
+                # copy docker-compose across
+                echo -e "${SSH_PRIVATE_KEY}" > private_key
+                chmod 400 private_key
+
+                # 3 steps: Pull new image, stop old version, start new version
+                echo "Pulling image ${FULL_IMAGE}..."
+                ssh -o StrictHostKeyChecking=no -i private_key root@${TARGET_HOST} "docker pull ${FULL_IMAGE}"
+                echo "Stopping previous container..."
+                ssh -o StrictHostKeyChecking=no -i private_key root@${TARGET_HOST} "docker rm --force ${CONTAINER_NAME}"
+                echo "Starting new container from image ${FULL_IMAGE}..."
+                ssh -o StrictHostKeyChecking=no -i private_key root@${TARGET_HOST} "docker run --detach --restart unless-stopped --name ${CONTAINER_NAME} -p 8080:8080 -e CAN_I_BE_LOUD_BIND_ADDR=0.0.0.0 ${FULL_IMAGE}"
+
+                # every time we deploy one image, delete 2 if we have more than 6, so that we keep 5
+                echo "Deleting old images..."
+                ssh -o StrictHostKeyChecking=no -i private_key root@${TARGET_HOST} -t 'if [[ $(docker images | grep canibeloud | tr -s " " | cut -d" " -f3 | wc -l) -gt 6 ]]; then docker images | grep canibeloud |  tr -s " " | cut -d" " -f3 | tail -n2 | xargs docker rmi -f; else echo "Nothing to delete"; fi'
+
 
   - name: update-pipeline
     plan:
