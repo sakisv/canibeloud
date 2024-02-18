@@ -18,8 +18,3 @@ jobs:
       run: |
         cd canibeloud
         cargo test
-    
-    - name: Build
-      run: |
-        cd canibeloud
-        cargo build
