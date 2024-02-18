@@ -1,0 +1,23 @@
+name: Run tests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: |
+        cd canibeloud
+        cargo build --verbose
+    - name: Run tests
+      run: |
+        cd canibeloud
+        cargo test --verbose
