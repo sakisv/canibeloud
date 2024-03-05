@@ -3,7 +3,7 @@ resource "aws_ssm_parameter" "param" {
 
   name  = "${var.common_prefix}${each.key}"
   value = each.value
-  type  = "SecureString"
+  type  = "String"
 }
 
 variable "secrets" {
