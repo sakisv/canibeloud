@@ -26,6 +26,7 @@ fn can_i_be_loud_from_tz(timezone: &str) -> CanIBeLoudResponse {
     let rule: Box<dyn Rulelike> = match timezone {
         "Europe/London" => Box::new(rules::europe_london::EuropeLondon{}),
         "Europe/Athens" => Box::new(rules::europe_athens::EuropeAthens{}),
+        "Europe/Zurich" => Box::new(rules::europe_zurich::EuropeZurich{}),
         _ => Box::new(rules::rule::OtherTimezone{}),
     };
 
