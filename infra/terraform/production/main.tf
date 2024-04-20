@@ -7,7 +7,7 @@ module "server" {
   server_type = "cax11" # arm64 - 2vCPU, 4GB RAM, 40GB ssd
   location    = "hel1"
   dns_records = [
-    { "name" : "@", "use_proxy" : false }, # TODO: change when caddy is configured
+    { "name" : "@", "use_proxy" : true },
     { "name" : "www", "use_proxy" : false },
   ]
   public_bucket_url  = data.pass_password.public_bucket_url.password
