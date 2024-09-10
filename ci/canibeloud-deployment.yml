@@ -137,7 +137,7 @@ jobs:
           params:
             SSH_PRIVATE_KEY: |
               ((ssh_private_key))
-            TARGET_HOST: "canibeloud.com"
+            TARGET_HOST: "www.canibeloud.com"
             CONTAINER_NAME: "canibeloud"
 
           run: &deploy-steps
