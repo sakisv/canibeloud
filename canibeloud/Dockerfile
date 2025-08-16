@@ -1,4 +1,4 @@
-ARG TARGET_ARCHITECTURE=aarch64-unknown-linux-gnu
+ARG TARGET_ARCHITECTURE=x86_64-unknown-linux-gnu
 
 
 # step 1
